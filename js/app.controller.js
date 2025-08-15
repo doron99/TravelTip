@@ -16,8 +16,34 @@ window.app = {
     onShareLoc,
     onSetSortBy,
     onSetFilterBy,
+    onBackdropClick
 }
+function onBackdropClick(obj) {
+    // const modalBackdrop = document.getElementsByClassName('modal-backdrop')[0];
+    // const modalContent = document.getElementsByClassName('modal');
+    // modalBackdrop.style.display = 'none';
+    // if (event.target === this) {
+    //         // This means the click was on the backdrop, not inside the modal content
+    //         // You can now close the modal or perform other actions
+    //         closeModal();
+    //     }
 
+}
+function _closeModal() {
+    document.querySelector('.modal-backdrop').style.display = 'none'; // Or remove the element
+}
+function setOnBackdropListener() {
+    const backdrop = document.querySelector('.modal-backdrop'); 
+    backdrop.addEventListener('click', function(event) {
+        console.log('')
+        // Check if the clicked target (or any of its ancestors) is the modalInner
+        const clickedInsideModal = event.target.closest('.modal');
+        // If clickedInsideModal is null, it means the click was outside the modal content
+        if (!clickedInsideModal) {
+            _closeModal();
+        }
+    });
+}
 function onInit() {
     //mapService.setGoogleMapApiKey();
     mapService.setGoogleMapApiKey()
@@ -34,6 +60,8 @@ function onInit() {
             flashMsg('Cannot init map')
         })
     })
+    setOnBackdropListener();
+    
     
 }
 function getLatLngObjByLoc(loc) {
@@ -340,3 +368,4 @@ function cleanStats(stats) {
     }, [])
     return cleanedStats
 }
+
