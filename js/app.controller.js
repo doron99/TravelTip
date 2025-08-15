@@ -32,8 +32,10 @@ function onBackdropClick(obj) {
 function _closeModal() {
     document.querySelector('.modal-backdrop').style.display = 'none'; // Or remove the element
 }
-function setOnBackdropListener() {
+function setOnBackdropAndXbuttonListener() {
     const backdrop = document.querySelector('.modal-backdrop'); 
+    const xButton = document.querySelector('.xButton'); 
+
     backdrop.addEventListener('click', function(event) {
         console.log('')
         // Check if the clicked target (or any of its ancestors) is the modalInner
@@ -42,6 +44,9 @@ function setOnBackdropListener() {
         if (!clickedInsideModal) {
             _closeModal();
         }
+    });
+    xButton.addEventListener('click', function(event) {
+        _closeModal();
     });
 }
 function onInit() {
@@ -60,7 +65,7 @@ function onInit() {
             flashMsg('Cannot init map')
         })
     })
-    setOnBackdropListener();
+    setOnBackdropAndXbuttonListener();
     
     
 }
@@ -140,8 +145,15 @@ function onSearchAddress(ev) {
 }
 
 function onAddLoc(geo) {
-    const locName = prompt('Loc name', geo.address || 'Just a place')
-    if (!locName) return
+    
+    document.querySelector('.modal-backdrop').style.display = 'flex';
+    // document.querySelector('.modal-body').innerHTML = 
+    // `
+    //     <input >
+    // `
+    return;
+    // const locName = prompt('Loc name', geo.address || 'Just a place')
+    // if (!locName) return
 
     const loc = {
         name: locName,
