@@ -171,6 +171,7 @@ function onSelectLoc(locId) {
 }
 
 function displayLoc(loc) {
+    console.log('selected loc',loc)
     document.querySelector('.loc.active')?.classList?.remove('active')
     document.querySelector(`.loc[data-id="${loc.id}"]`).classList.add('active')
 
