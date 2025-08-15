@@ -8,7 +8,8 @@ export const utilService = {
     elapsedTime,
     getColors,
     updateQueryParams,
-    getDistance
+    getDistance,
+    getTodayWithoutTimeAsTimestamp
 }
 
 function saveToStorage(key, value) {
@@ -116,4 +117,17 @@ function getDistance(latLng1, latLng2, unit) {
         dist = +dist.toFixed(2)
         return dist
     }
+}
+function getTodayWithoutTimeAsTimestamp() {
+    const originalDate = new Date(); // Or new Date('2025-08-15T10:30:00.000Z');
+
+    // Create a new Date object to avoid modifying the original
+    const dateNoTime = new Date(originalDate);
+
+    // Set the hours, minutes, seconds, and milliseconds to zero
+    dateNoTime.setHours(0, 0, 0, 0);
+
+    // Get the timestamp in milliseconds since the Unix Epoch
+    const timestampNoTime = dateNoTime.getTime();
+    return timestampNoTime;
 }

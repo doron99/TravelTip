@@ -30,7 +30,8 @@ export const locService = {
     save,
     setFilterBy,
     setSortBy,
-    getLocCountByRateMap
+    getLocCountByRateMap,
+    getLocCountByLastUpdatedMap
 }
 
 function query() {
@@ -97,6 +98,24 @@ function getLocCountByRateMap() {
             }, { high: 0, medium: 0, low: 0 })
             locCountByRateMap.total = locs.length
             return locCountByRateMap
+        })
+}
+//------------by lastUpdated----------------//
+//-- question: in insert, the createdAt field always initilized,
+//  which means it will not reach to 'never' option --//
+function getLocCountByLastUpdatedMap() {
+    const todayTimestamp = utilService.getTodayWithoutTimeAsTimestamp();
+    return storageService.query(DB_KEY)
+        .then(locs => {
+            const locCountByLastUpdatedMap = locs.reduce((map, loc) => {
+                console.log('loc.updatedAt', loc.updatedAt);
+                if (loc.updatedAt >= todayTimestamp) map.today++
+                else if (loc.updatedAt < todayTimestamp) map.past++
+                else map.never++
+                return map
+            }, { today: 0, past: 0, never: 0 })
+            locCountByLastUpdatedMap.total = locs.length
+            return locCountByLastUpdatedMap
         })
 }
 
