@@ -19,7 +19,10 @@ window.app = {
 }
 
 function onInit() {
-    getFilterByFromQueryParams()
+    //mapService.setGoogleMapApiKey();
+    mapService.setGoogleMapApiKey()
+    .then(() => {
+        getFilterByFromQueryParams()
     loadAndRenderLocs()
     mapService.initMap()
         .then(() => {
@@ -30,6 +33,8 @@ function onInit() {
             console.error('OOPs:', err)
             flashMsg('Cannot init map')
         })
+    })
+    
 }
 
 function renderLocs(locs) {

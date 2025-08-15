@@ -5,15 +5,51 @@ export const mapService = {
     setMarker,
     panTo,
     lookupAddressGeo,
-    addClickListener
+    addClickListener,
+    setGoogleMapApiKey
 }
 
 // TODO: Enter your API Key
-const API_KEY = ''
+let API_KEY = ''
 var gMap
 var gMarker
 
+// function setGoogleMapApiKey() {
+//     const googleMapApiKeyValue = localStorage.getItem('GOOGLE_MAP_API_KEY');
+//     if (!googleMapApiKeyValue) {
+//         const apiKeyResFromPromp = prompt('Enter google map api key')
+//         if ((apiKeyResFromPromp || '').length > 0) {
+//             localStorage.setItem('GOOGLE_MAP_API_KEY', apiKeyResFromPromp);
+//             API_KEY = googleMapApiKeyValue;
+//         } else {
+//             return Promise.reject(new Error('GOOGLE_MAP_API_KEY not found'));        }
+//     } else {
+//         API_KEY = googleMapApiKeyValue;
+//     }
+// }
+function setGoogleMapApiKey() {
+    return new Promise((resolve, reject) => {
+        const googleMapApiKeyValue = localStorage.getItem('GOOGLE_MAP_API_KEY');
+        
+        if (!googleMapApiKeyValue) {
+            const apiKeyResFromPrompt = prompt('Enter Google Maps API key');
+            if ((apiKeyResFromPrompt || '').length > 0) {
+                localStorage.setItem('GOOGLE_MAP_API_KEY', apiKeyResFromPrompt);
+                API_KEY = apiKeyResFromPrompt; // Use the new key
+                resolve(API_KEY); // Resolve with the new API key
+            } else {
+                reject(new Error('GOOGLE_MAP_API_KEY not found'));
+            }
+        } else {
+            API_KEY = googleMapApiKeyValue;
+            resolve(API_KEY); // Resolve with the existing API key
+        }
+    });
+}
+
 function initMap(lat = 32.0749831, lng = 34.9120554) {
+    
+
     return _connectGoogleApi()
         .then(() => {
             gMap = new google.maps.Map(
@@ -34,6 +70,7 @@ function lookupAddressGeo(geoOrAddress) {
     // Sample URLs:
     // const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${address}`
     // const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=40.714224,-73.961452`
+    const googleMapApiKey = localStorage.getItem('username');
 
     var url = `https://maps.googleapis.com/maps/api/geocode/json?key=${API_KEY}&`
     url += (geoOrAddress.lat) ? `latlng=${geoOrAddress.lat},${geoOrAddress.lng}` :
