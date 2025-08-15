@@ -36,7 +36,10 @@ function onInit() {
     })
     
 }
-
+function getLatLngObjByLoc(loc) {
+    return {   lat:loc.geo.lat,
+               lng:loc.geo.lng}
+}
 function renderLocs(locs) {
     const selectedLocId = getLocIdFromQueryParams()
     var strHTML = locs.map(loc => {
@@ -50,8 +53,7 @@ function renderLocs(locs) {
             ${(window.gUserPos != null) ? 
             `<p>Distance:${utilService.getDistance(
                 window.gUserPos, 
-                {   lat:loc.geo.lat,
-                    lng:loc.geo.lng}
+                getLatLngObjByLoc(loc)
                 ,    'km')}
             </p>`
             : ''}
@@ -195,6 +197,10 @@ function displayLoc(loc) {
     el.querySelector('.loc-name').innerText = loc.name
     el.querySelector('.loc-address').innerText = loc.geo.address
     el.querySelector('.loc-rate').innerHTML = '★'.repeat(loc.rate)
+    if (window.gUserPos) {
+        el.querySelector('.loc-distance').innerHTML = `Distance: <span>${utilService.getDistance(getLatLngObjByLoc(loc),window.gUserPos)}</span>`
+    }
+
     el.querySelector('[name=loc-copier]').value = window.location
     el.classList.add('show')
 
