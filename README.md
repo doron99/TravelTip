@@ -51,16 +51,18 @@ export const locService = {
     save,
     setFilterBy,
     setSortBy,
-    getLocCountByRateMap
+    getLocCountByRateMap,
+    getLocCountByLastUpdatedMap
 }
 
 export const mapService = {
     initMap,
-    getPosition,
+    getUserPosition,
     setMarker,
     panTo,
     lookupAddressGeo,
-    addClickListener
+    addClickListener,
+    setGoogleMapApiKey //set in localstorage instead of hard coded
 }
 ```
 
@@ -71,14 +73,14 @@ export const mapService = {
 
 window.app = {
     onRemoveLoc,
-    onUpdateLoc,
+    openModalForUpdate,
     onSelectLoc,
     onPanToUserPos,
     onSearchAddress,
     onCopyLoc,
     onShareLoc,
     onSetSortBy,
-    onSetFilterBy
+    onSetFilterBy,
 }
 ```
 

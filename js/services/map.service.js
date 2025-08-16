@@ -9,24 +9,11 @@ export const mapService = {
     setGoogleMapApiKey
 }
 
-// TODO: Enter your API Key
 let API_KEY = ''
 var gMap
 var gMarker
 
-// function setGoogleMapApiKey() {
-//     const googleMapApiKeyValue = localStorage.getItem('GOOGLE_MAP_API_KEY');
-//     if (!googleMapApiKeyValue) {
-//         const apiKeyResFromPromp = prompt('Enter google map api key')
-//         if ((apiKeyResFromPromp || '').length > 0) {
-//             localStorage.setItem('GOOGLE_MAP_API_KEY', apiKeyResFromPromp);
-//             API_KEY = googleMapApiKeyValue;
-//         } else {
-//             return Promise.reject(new Error('GOOGLE_MAP_API_KEY not found'));        }
-//     } else {
-//         API_KEY = googleMapApiKeyValue;
-//     }
-// }
+
 function setGoogleMapApiKey() {
     return new Promise((resolve, reject) => {
         const googleMapApiKeyValue = localStorage.getItem('GOOGLE_MAP_API_KEY');
