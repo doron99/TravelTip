@@ -108,7 +108,6 @@ function getLocCountByLastUpdatedMap() {
     return storageService.query(DB_KEY)
         .then(locs => {
             const locCountByLastUpdatedMap = locs.reduce((map, loc) => {
-                console.log('loc.updatedAt', loc.updatedAt);
                 if (loc.updatedAt >= todayTimestamp) map.today++
                 else if (loc.updatedAt < todayTimestamp) map.past++
                 else map.never++

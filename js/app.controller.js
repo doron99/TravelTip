@@ -16,25 +16,20 @@ window.app = {
     onShareLoc,
     onSetSortBy,
     onSetFilterBy,
-    onBackdropClick
+    onSaveButtonClick
 }
-function onBackdropClick(obj) {
-    // const modalBackdrop = document.getElementsByClassName('modal-backdrop')[0];
-    // const modalContent = document.getElementsByClassName('modal');
-    // modalBackdrop.style.display = 'none';
-    // if (event.target === this) {
-    //         // This means the click was on the backdrop, not inside the modal content
-    //         // You can now close the modal or perform other actions
-    //         closeModal();
-    //     }
-
-}
+//close and clean values in fields
 function _closeModal() {
     document.querySelector('.modal-backdrop').style.display = 'none'; // Or remove the element
+
+    document.querySelector('.modal-body .currGeo').value = ''
+    document.querySelector('.modal-body .locName').value = '';
+    document.querySelector('.modal-body .rate').value = '';
 }
 function setOnBackdropAndXbuttonListener() {
     const backdrop = document.querySelector('.modal-backdrop'); 
     const xButton = document.querySelector('.xButton'); 
+    const submitButton = document.querySelector('.submitButton'); 
 
     backdrop.addEventListener('click', function(event) {
         console.log('')
@@ -48,6 +43,23 @@ function setOnBackdropAndXbuttonListener() {
     xButton.addEventListener('click', function(event) {
         _closeModal();
     });
+    submitButton.addEventListener('click', function(event) {
+        onAddLoc(getLocObjFromModal());
+        _closeModal();
+        
+    });
+}
+function getLocObjFromModal() {
+    const currGeo = JSON.parse(document.querySelector('.modal-body .currGeo').value)
+    const locName = document.querySelector('.modal-body .locName').value;
+    const rate = document.querySelector('.modal-body .rate').value;
+
+    return {
+        geo: currGeo,
+        locName: locName,
+        rate: rate
+    };
+    
 }
 function onInit() {
     //mapService.setGoogleMapApiKey();
@@ -57,8 +69,9 @@ function onInit() {
     loadAndRenderLocs()
     mapService.initMap()
         .then(() => {
-            // onPanToTokyo()
-            mapService.addClickListener(onAddLoc)
+            //mapService.addClickListener(onAddLoc)
+
+            mapService.addClickListener(openModalForAddOrUpdate)
         })
         .catch(err => {
             console.error('OOPs:', err)
@@ -143,22 +156,30 @@ function onSearchAddress(ev) {
             flashMsg('Cannot lookup address')
         })
 }
+function onSaveButtonClick() {
+    const currGeo = JSON.parse(document.querySelector('.modal-body .currGeo').value)
+    const locName = document.querySelector('.modal-body .locName').value;
+    const rate = document.querySelector('.modal-body .rate').value;
+    currGeo.address = locName;
+    currGeo.rate = rate;
+    console.log('arrived',currGeo);
 
-function onAddLoc(geo) {
+}
+function openModalForAddOrUpdate(geo) {
+    document.querySelector('.modal-backdrop').style.display = 'flex'; //make backdrop and modal visible
+
+    document.querySelector('.modal-body .locName').value = '';//geo.address;
+    document.querySelector('.modal-body .rate').value = 3;
+    document.querySelector('.modal-body .currGeo').value = JSON.stringify(geo);
+
+
+}
+function onAddLoc(objFromModal) {
     
-    document.querySelector('.modal-backdrop').style.display = 'flex';
-    // document.querySelector('.modal-body').innerHTML = 
-    // `
-    //     <input >
-    // `
-    return;
-    // const locName = prompt('Loc name', geo.address || 'Just a place')
-    // if (!locName) return
-
     const loc = {
-        name: locName,
-        rate: +prompt(`Rate (1-5)`, '3'),
-        geo
+        name: objFromModal.locName,
+        rate: objFromModal.rate,//+prompt(`Rate (1-5)`, '3'),
+        geo: objFromModal.geo
     }
     locService.save(loc)
         .then((savedLoc) => {

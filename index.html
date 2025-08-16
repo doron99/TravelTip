@@ -78,12 +78,13 @@
     <div class="user-msg"></div>
     <div class="modal-backdrop" >
         <div class="modal" >
+            <span class="xButton">x</span>
             <div class="modal-header"></div>
             <div class="modal-body">
-                <span class="xButton">x</span>
-                <input placeholder="name" type="text" class="name">
-                <input placeholder="rate" type="number" class="rate">
-                <button onclick="asd()">submit</button>
+                <input placeholder="location" type="text" class="locName" title="location">
+                <input placeholder="rate" type="number" class="rate" min="1" max="5" value="3" title="rate">
+                <button class="submitButton">submit</button>
+                <input class="currGeo" hidden>
             </div>
         </div>
     </div>
