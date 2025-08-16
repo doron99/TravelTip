@@ -4,11 +4,26 @@ import { mapService } from './services/map.service.js'
 
 window.onload = onInit
 window.gUserPos = null;
+
+
+
+
+const modalBackdrop = document.querySelector('.modal-backdrop');
+const modalLocName = document.querySelector('.modal-body .locName')
+const modalRate = document.querySelector('.modal-body .rate')
+const modalCurrLocForUpdate = document.querySelector('.modal-body .currLocForUpdate')
+const modalState = document.querySelector('.modal-body .modal-state')
+const modalCurrGeo = document.querySelector('.modal-body .currGeo')
+
+const currLocOriginal = document.querySelector('.modal-body .currLocOriginal')
+
+const xButton = document.querySelector('.xButton'); 
+const submitButton = document.querySelector('.submitButton'); 
 // To make things easier in this project structure 
 // functions that are called from DOM are defined on a global app object
 window.app = {
     onRemoveLoc,
-    onUpdateLoc,
+    openModalForUpdate,
     onSelectLoc,
     onPanToUserPos,
     onSearchAddress,
@@ -16,23 +31,28 @@ window.app = {
     onShareLoc,
     onSetSortBy,
     onSetFilterBy,
-    onSaveButtonClick
+}
+function printAllModalState() {
+    //console.log('modalBackdrop',modalBackdrop.value)
+    console.log('modalLocName:',modalLocName.value)
+    console.log('modalRate:',modalRate.value)
+    console.log('modalCurrLocForUpdate:',modalCurrLocForUpdate.value)
+    console.log('modalState:', `'${modalState.value}'`)
 }
 //close and clean values in fields
 function _closeModal() {
-    document.querySelector('.modal-backdrop').style.display = 'none'; // Or remove the element
+    modalBackdrop.style.display = 'none'; // Or remove the element
 
-    document.querySelector('.modal-body .currGeo').value = ''
-    document.querySelector('.modal-body .locName').value = '';
-    document.querySelector('.modal-body .rate').value = '';
+    modalCurrGeo.value = ''
+    modalLocName.value = '';
+    modalRate.value = '';
+    modalState.value = '';
+
 }
 function setOnBackdropAndXbuttonListener() {
-    const backdrop = document.querySelector('.modal-backdrop'); 
-    const xButton = document.querySelector('.xButton'); 
-    const submitButton = document.querySelector('.submitButton'); 
 
-    backdrop.addEventListener('click', function(event) {
-        console.log('')
+    modalBackdrop.addEventListener('click', function(event) {
+        event.preventDefault();
         // Check if the clicked target (or any of its ancestors) is the modalInner
         const clickedInsideModal = event.target.closest('.modal');
         // If clickedInsideModal is null, it means the click was outside the modal content
@@ -44,21 +64,44 @@ function setOnBackdropAndXbuttonListener() {
         _closeModal();
     });
     submitButton.addEventListener('click', function(event) {
-        onAddLoc(getLocObjFromModal());
+        printAllModalState();
+        if (modalState.value == 'create') {
+            const objFromModal = getLocObjFromModal('create');
+            const loc = {
+                name: objFromModal.locName,
+                rate: objFromModal.rate,//+prompt(`Rate (1-5)`, '3'),
+                geo: objFromModal.geo
+            }
+            onAddLoc(loc);
+        } else if(modalState.value == 'update') {
+            const objFromModal = getLocObjFromModal('update');
+
+            onUpdateLoc(objFromModal)
+        }
+        
         _closeModal();
         
     });
 }
-function getLocObjFromModal() {
-    const currGeo = JSON.parse(document.querySelector('.modal-body .currGeo').value)
-    const locName = document.querySelector('.modal-body .locName').value;
-    const rate = document.querySelector('.modal-body .rate').value;
+function getLocObjFromModal(modalState) {
 
-    return {
+
+    if (modalState == 'create') {
+        const currGeo = JSON.parse(modalCurrGeo.value)
+
+        return {
         geo: currGeo,
-        locName: locName,
-        rate: rate
-    };
+        locName: modalLocName.value,
+        rate: modalRate.value
+        };
+    } else { //update
+        const currLoc = JSON.parse(modalCurrLocForUpdate.value)
+
+        currLoc.rate = modalRate.value;
+        currLoc.name = modalLocName.value;
+        return currLoc;
+    }
+    
     
 }
 function onInit() {
@@ -71,7 +114,7 @@ function onInit() {
         .then(() => {
             //mapService.addClickListener(onAddLoc)
 
-            mapService.addClickListener(openModalForAddOrUpdate)
+            mapService.addClickListener(openModalForAdd)
         })
         .catch(err => {
             console.error('OOPs:', err)
@@ -111,7 +154,7 @@ function renderLocs(locs) {
             </p>
             <div class="loc-btns">     
                <button title="Delete" onclick="app.onRemoveLoc('${loc.id}')">🗑️</button>
-               <button title="Edit" onclick="app.onUpdateLoc('${loc.id}')">✏️</button>
+               <button title="Edit" onclick="app.openModalForUpdate('${loc.id}')">✏️</button>
                <button title="Select" onclick="app.onSelectLoc('${loc.id}')">🗺️</button>
             </div>     
         </li>`}).join('')
@@ -156,31 +199,17 @@ function onSearchAddress(ev) {
             flashMsg('Cannot lookup address')
         })
 }
-function onSaveButtonClick() {
-    const currGeo = JSON.parse(document.querySelector('.modal-body .currGeo').value)
-    const locName = document.querySelector('.modal-body .locName').value;
-    const rate = document.querySelector('.modal-body .rate').value;
-    currGeo.address = locName;
-    currGeo.rate = rate;
-    console.log('arrived',currGeo);
 
+function openModalForAdd(geo) {
+    modalBackdrop.style.display = 'flex'; //make backdrop and modal visible
+
+    modalLocName.value = '';//geo.address;
+    modalRate.value = 3;
+    modalCurrGeo.value = JSON.stringify(geo);
+    modalState.value = 'create';
 }
-function openModalForAddOrUpdate(geo) {
-    document.querySelector('.modal-backdrop').style.display = 'flex'; //make backdrop and modal visible
-
-    document.querySelector('.modal-body .locName').value = '';//geo.address;
-    document.querySelector('.modal-body .rate').value = 3;
-    document.querySelector('.modal-body .currGeo').value = JSON.stringify(geo);
-
-
-}
-function onAddLoc(objFromModal) {
+function onAddLoc(loc) {
     
-    const loc = {
-        name: objFromModal.locName,
-        rate: objFromModal.rate,//+prompt(`Rate (1-5)`, '3'),
-        geo: objFromModal.geo
-    }
     locService.save(loc)
         .then((savedLoc) => {
             flashMsg(`Added Location (id: ${savedLoc.id})`)
@@ -217,25 +246,43 @@ function onPanToUserPos() {
             flashMsg('Cannot get your position')
         })
 }
+function openModalForUpdate(locId) {
+    locService.getById(locId).then((loc) => {
+        console.log('loc for update', loc)
+        currLocOriginal.value = JSON.stringify(loc)
+        modalBackdrop.style.display = 'flex'; //make backdrop and modal visible
 
-function onUpdateLoc(locId) {
-    locService.getById(locId)
-        .then(loc => {
-            const rate = prompt('New rate?', loc.rate)
-            if (rate && rate !== loc.rate) {
-                loc.rate = rate
-                locService.save(loc)
-                    .then(savedLoc => {
-                        flashMsg(`Rate was set to: ${savedLoc.rate}`)
-                        loadAndRenderLocs()
-                    })
-                    .catch(err => {
-                        console.error('OOPs:', err)
-                        flashMsg('Cannot update location')
-                    })
+        modalLocName.value = loc.name;//geo.address;
+        modalRate.value = loc.rate;
+        modalCurrLocForUpdate.value = JSON.stringify(loc);
+        modalState.value = 'update'
+    });
+}
+function clearCurrLocOriginalValue() {
+    currLocOriginal.value = '';
 
-            }
+}
+function onUpdateLoc(loc) {
+    //for validation
+    const _currLocOriginal = JSON.parse(currLocOriginal.value)
+    if ((_currLocOriginal.rate == +loc.rate) && (_currLocOriginal.name == loc.name)) {
+        flashMsg(`No changes were made to your data`);
+        clearCurrLocOriginalValue();
+        return;
+    }
+
+    locService.save(loc)
+        .then(savedLoc => {
+            flashMsg(`Rate was set to: ${savedLoc.rate}`)
+            clearCurrLocOriginalValue();
+            loadAndRenderLocs()
         })
+        .catch(err => {
+            console.error('OOPs:', err)
+            flashMsg('Cannot update location')
+        })
+    
+
 }
 
 function onSelectLoc(locId) {
