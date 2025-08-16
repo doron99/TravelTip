@@ -25,6 +25,7 @@ function setGoogleMapApiKey() {
                 API_KEY = apiKeyResFromPrompt; // Use the new key
                 resolve(API_KEY); // Resolve with the new API key
             } else {
+                document.querySelector('.error-msg-api-key').innerHTML = 'You need to enter your Google API key to view the map. Please provide your API key to continue'
                 reject(new Error('GOOGLE_MAP_API_KEY not found'));
             }
         } else {

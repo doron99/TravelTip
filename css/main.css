@@ -71,3 +71,6 @@
 .hidden {
     z-index: -1;
 }
+.error-msg-api-key {
+    color:red;
+}
